@@ -1,0 +1,65 @@
+import eg.edu.alexu.csd.oop.game.object.Shape;
+
+import java.util.ArrayList;
+import java.util.concurrent.locks.Lock;
+
+public class ReusablePool {
+
+    private static ReusablePool onlyInstance = null;
+    public static  final int Default_pool_size=10;
+    private ArrayList<Shape> Reusables;
+    private int maxpoolsize=Default_pool_size;
+    private ReusablePool(){
+        Reusables=new ArrayList<Shape>();
+    }
+public Shape acquireShape()
+{
+for(Shape sh:Reusables)
+{
+if(!sh.isinuse())
+{
+    sh.setInuse(true);
+    return  sh;
+}
+
+}
+if(Reusables.size()>=getMaxpoolsize())
+{
+    return  null;
+}
+Shape sh=new Shape();
+sh.setInuse(true);
+Reusables.add(sh);
+return  sh;
+}
+public int getMaxpoolsize()
+{
+    return  maxpoolsize;
+}
+public void setMaxpoolsize(int maxpoolsize)
+{
+    this.maxpoolsize=maxpoolsize;
+}
+public void releaseShape(Shape subject)
+{
+int idx=Reusables.indexOf(subject);
+if(idx==-1)
+{
+    return;
+}
+Shape sh=Reusables.get(idx);
+sh.setInuse(false);
+
+}
+
+    public static ReusablePool getInstance() {
+
+
+        synchronized(ReusablePool.class){
+            if(onlyInstance == null) {
+                onlyInstance = new ReusablePool();
+            }
+        }
+        return onlyInstance;
+    }
+}
